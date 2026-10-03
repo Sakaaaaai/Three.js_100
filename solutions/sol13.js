@@ -1,0 +1,55 @@
+// Q13: ライトの追加（SpotLight）
+// 模範解答
+
+import * as THREE from "three";
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+// 床
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(10, 10),
+  new THREE.MeshStandardMaterial({ color: 0xaaaaaa })
+);
+plane.rotation.x = -Math.PI / 2;
+plane.position.y = -1;
+scene.add(plane);
+
+camera.position.set(0, 2, 5);
+camera.lookAt(0, 0, 0);
+
+// 1. スポットライトの作成
+const spotLight = new THREE.SpotLight(0xffffff, 10);
+spotLight.position.set(0, 5, 0); // 真上から
+spotLight.angle = Math.PI / 6; // 照射角度（狭め）
+spotLight.penumbra = 0.2; // 縁を少しぼかす
+scene.add(spotLight);
+
+// 2. ヘルパーの追加
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+scene.add(spotLightHelper);
+
+// 環境光（補助）
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+scene.add(ambientLight);
+
+function animate() {
+  requestAnimationFrame(animate);
+  cube.rotation.y += 0.01;
+  spotLightHelper.update(); // ライトが動く場合は必要
+  renderer.render(scene, camera);
+}
+animate();
